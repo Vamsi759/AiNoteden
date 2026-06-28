@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Subject Dashboard</title>
+
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+
+<style>
+body {
+	margin: 0;
+	font-family: Arial, sans-serif;
+}
+
+.container-fluid {
+	display: flex;
+	height: 100vh;
+	padding: 0;
+}
+
+/* LEFT SIDEBAR */
+.sidebar {
+	width: 30%;
+	background: #2c3e50;
+	color: white;
+	padding: 15px;
+	overflow-y: auto;
+	margin-left: 0; /* Forced left margin to 0 */
+}
+
+/* RIGHT CONTENT AREA */
+.content {
+	width: 70%;
+	padding: 20px;
+	background: #ecf0f1;
+	overflow-y: auto;
+	margin-right: 0; /* Forced right margin to 0 */
+}
+
+/* TYPOGRAPHY */
+h2 {
+	text-align: left; /* Aligned nicely to the content stream */
+	margin-top: 20px;
+	font-weight: bold;
+}
+
+.sidebar h2 {
+	text-align: center;
+}
+
+/* BUTTONS */
+.btn-sidebar {
+	width: 100%;
+	padding: 10px;
+	margin-top: 5px;
+	border: none;
+	background: #34495e;
+	color: white;
+	text-align: left;
+	cursor: pointer;
+}
+
+.btn-sidebar:hover {
+	background: #1abc9c;
+}
+
+.subtopic-container {
+	margin-left: 20px;
+}
+
+.sub-btn {
+	width: 90%;
+	padding: 8px;
+	margin-top: 4px;
+	border: none;
+	background: #16a085;
+	color: white;
+	text-align: left;
+	cursor: pointer;
+}
+
+.sub-btn:hover {
+	background: #27ae60;
+}
+
+/* FORM CONTAINERS */
+.ap {
+	max-width: 500px;
+	margin: 20px 0 40px 0; /* Aligned left, spacing below */
+	padding: 25px;
+	background: #C5BBF2;
+	border: 1px solid #ccc;
+	border-radius: 10px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.form-control {
+	margin-bottom: 15px;
+}
+/* Center container and its internal content */
+.sec {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	padding: 20px 0;
+}
+
+/* Ensure the headings and forms are aligned consistently */
+.sec h2 {
+	text-align: center;
+	margin-top: 20px;
+	margin-bottom: 15px;
+	width: 100%; /* Spans full width to keep text centered */
+}
+
+.sec .ap {
+	width: 100%;
+	max-width: 500px;
+	/* Prevents forms from getting too wide on large screens */
+	margin: 0 auto 30px auto; /* Centers the block horizontally */
+	margin-right:10px;
+}
+
+/* Optional: Center the divider line */
+.sec hr {
+	width: 80%;
+	max-width: 600px;
+	margin: 20px 0;
+}
+
+.zzz {
+	
+	margin-left: 15px;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    background:#f4f7fc;
+    color:#333;
+}
+
+/* MAIN LAYOUT */
+.container-fluid{
+    display:flex;
+    height:100vh;
+    padding:0;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:28%;
+    background:linear-gradient(180deg,#1e3c72,#2a5298);
+    color:white;
+    padding:20px;
+    overflow-y:auto;
+    box-shadow:4px 0 15px rgba(0,0,0,0.15);
+}
+
+.sidebar h2{
+    text-align:center;
+    margin-bottom:20px;
+    font-weight:700;
+    letter-spacing:1px;
+}
+
+/* CONTENT */
+.content{
+    width:72%;
+    padding:25px;
+    overflow-y:auto;
+    background:#eef2f7;
+}
+
+/* HEADINGS */
+h2{
+    font-weight:700;
+    color:#2c3e50;
+}
+
+/* SIDEBAR BUTTONS */
+.btn-sidebar{
+    width:100%;
+    border:none;
+    padding:12px;
+    margin-bottom:8px;
+    border-radius:8px;
+    background:rgba(255,255,255,0.12);
+    color:white;
+    font-weight:600;
+    transition:0.3s;
+    text-align:left;
+}
+
+.btn-sidebar:hover{
+    background:#00c9a7;
+    transform:translateX(5px);
+}
+
+/* SUBTOPICS */
+.subtopic-container{
+    margin-left:15px;
+    margin-bottom:10px;
+}
+
+.sub-btn{
+    width:95%;
+    border:none;
+    padding:10px;
+    margin:5px 0;
+    border-radius:6px;
+    background:#16a085;
+    color:white;
+    transition:.3s;
+    font-size:14px;
+}
+
+.sub-btn:hover{
+    background:#27ae60;
+    transform:translateX(5px);
+}
+
+/* CONTENT CARD */
+.card{
+    border:none !important;
+    border-radius:15px !important;
+    overflow:hidden;
+}
+
+.card-header{
+    background:linear-gradient(45deg,#0d6efd,#4f8cff)!important;
+}
+
+.card-body{
+    background:white;
+    line-height:1.8;
+    font-size:16px;
+}
+
+/* FORM SECTION */
+.sec{
+    display:flex;
+    justify-content:center;
+    gap:40px;
+    padding:40px;
+    flex-wrap:wrap;
+}
+
+/* FORM BOX */
+.ap{
+    width:520px;
+    padding:25px;
+    background:white;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    transition:.3s;
+}
+
+.ap:hover{
+    transform:translateY(-4px);
+}
+
+.form-control{
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:15px;
+    border:1px solid #dcdcdc;
+}
+
+.form-control:focus{
+    border-color:#0d6efd;
+    box-shadow:0 0 10px rgba(13,110,253,.2);
+}
+
+/* BOOTSTRAP BUTTON */
+.btn-primary{
+    border:none;
+    border-radius:10px;
+    padding:12px;
+    font-weight:600;
+}
+
+/* AI CONTAINER */
+.aicontainer{
+    display:flex;
+    gap:40px;
+    padding:30px;
+    flex-wrap:wrap;
+}
+
+/* LEFT AI PANEL */
+.zzz,
+.ztwo{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+/* INPUTS */
+input[type="text"]{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    margin-top:5px;
+}
+
+input[type="text"]:focus{
+    outline:none;
+    border-color:#0d6efd;
+    box-shadow:0 0 8px rgba(13,110,253,.2);
+}
+
+/* TEXTAREAS */
+textarea{
+    width:100%;
+    border-radius:10px;
+    border:1px solid #d0d0d0;
+    padding:12px;
+    resize:vertical;
+    font-family:Consolas,monospace;
+    background:#fafafa;
+}
+
+textarea:focus{
+    outline:none;
+    border-color:#0d6efd;
+    box-shadow:0 0 10px rgba(13,110,253,.2);
+}
+
+/* NORMAL BUTTONS */
+button{
+    border:none;
+    background:linear-gradient(45deg,#0d6efd,#3f8cff);
+    color:white;
+    padding:10px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+    transition:.3s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 5px 15px rgba(13,110,253,.25);
+}
+
+/* LABELS */
+label{
+    font-weight:600;
+    color:#34495e;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{
+    width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#0d6efd;
+    border-radius:10px;
+}
+
+::-webkit-scrollbar-track{
+    background:#e9ecef;
+}
+
+/* MOBILE */
+@media(max-width:992px){
+
+    .container-fluid{
+        flex-direction:column;
+        height:auto;
+    }
+
+    .sidebar{
+        width:100%;
+        height:auto;
+    }
+
+    .content{
+        width:100%;
+    }
+
+    .sec{
+        flex-direction:column;
+        align-items:center;
+    }
+
+    .ap{
+        width:100%;
+        max-width:600px;
+    }
+
+    .aicontainer{
+        flex-direction:column;
+    }
+
+    .zzz,
+    .ztwo{
+        width:100%;
+    }
+
+    textarea{
+        width:100%;
+    }
+}
+.aicontainer{
+    display:flex;
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+    width:100%;
+    padding:20px;
+    flex-wrap:nowrap;   /* Important */
+}
+
+.zzz,
+.ztwo{
+    flex:1;
+    min-width:0;
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+
+.zzz textarea,
+.ztwo textarea{
+    width:100%;
+}
+
+.zzz input,
+.ztwo input{
+    width:100%;
+}
+
+/* Mobile */
+@media(max-width:992px){
+    .aicontainer{
+        flex-direction:column;
+    }
+}
+
+.aicontainer{
+    display:flex;
+    flex-direction:row;
+    gap:20px;
+    width:100%;
+}
+
+.zzz,
+.ztwo{
+    width:50%;
+    flex:0 0 50%;
+    box-sizing:border-box;
+    background:white;
+    padding:20px;
+    border-radius:12px;
+}
+.aicontainer{
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    gap:15px;
+    width:95%;
+    margin:auto;
+}
+
+.zzz,
+.ztwo{
+    flex:0 0 45%;
+    max-width:45%;
+    padding:15px;
+    background:white;
+    border-radius:10px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+
+</style>
+</head>
+
+<body class="bg-light">
+
+	<!--  div class="den">
+		<textarea id="apit" rows="10" cols="50"> Content is here …</textarea>
+		<button onclick="callapi()">click</button>
+	</div>
+-->
+	<div class="container-fluid">
+
+		<div class="sidebar" id="sidebar"></div>
+
+		<div class="content" id="contentArea">
+			<h2>Welcome</h2>
+			<p>Select any subtopic.</p>
+
+			<hr>
+
+
+		</div>
+
+	</div>
+	<div class="sec" >
+		<div style="margin-right:70px;">
+
+			<h2>Add Data :</h2>
+			<div class="ap">
+				<form th:action="@{/api/add}" method="post">
+					<input type="text" name="subjectname" class="form-control"
+						placeholder="Enter subjectname" required> <input
+						type="text" name="maintopicname" class="form-control"
+						placeholder="Enter maintopicname" required> <input
+						type="text" name="subtopicname" class="form-control"
+						placeholder="Enter subtopicname" required> <input
+						type="text" name="theory" class="form-control"
+						placeholder="Enter theory" required>
+					<button type="submit" class="btn btn-primary w-100 mt-2">Save</button>
+				</form>
+			</div>
+
+		</div>
+		<div>
+
+			<h2>Remove Data :</h2>
+			<div class="ap">
+				<form th:action="@{/api/del}" method="post">
+					<input type="text" name="subjectname" class="form-control"
+						placeholder="Enter subjectname" required> <input
+						type="text" name="maintopicname" class="form-control"
+						placeholder="Enter maintopicname" required> <input
+						type="text" name="subtopicname" class="form-control"
+						placeholder="Enter subtopicname" required> <input
+						type="text" name="theory" class="form-control"
+						placeholder="Enter theory" required>
+					<button type="submit" class="btn btn-primary w-100 mt-2">Save</button>
+				</form>
+			</div>
+		</div>
+
+
+
+
+		<!-- ----------------------------------------------------- -->
+
+
+
+
+
+
+	</div>
+	<div class="aicontainer" style="display:flex">
+	
+	<div class="zzz">
+	<br><br><br><br><br><br>
+		<input type="text" id="prompt" placeholder="Ask something"> <br>
+		<br>
+		<button onclick="sendPrompt()">Ask</button>
+		<br> <br>
+		<textarea id="result" rows="30" cols="70"> Contentishere …</textarea>
+		<hr>
+		<br> <br> <br>
+		<hr>
+
+	</div>
+	
+	<div class="ztwo">
+	
+	<label>MainStart</label>
+		<input type="text" id="mainstart" name="mainstart" placeholder="Add MainBegin"> 
+    <label>MainEnd</label>
+    <input type="text" id="mainend" name="mainend" placeholder="Add MainEnd">
+    <br><br><button onclick="callmaincut()">EditedCut</button>
+    <button onclick="callnormalcut()">NormalCut</button>
+    <br><br>
+    
+    <!--  
+    <label>HeadStart</label>
+		<input type="text" id="prompt" placeholder="add HeadStart"> 
+    <label>HeadEnd</label>
+    <input type="text" id="prompt" placeholder="add HeadEnd">
+    
+		<button onclick="callcuttheory()">AskButton</button>
+	-->
+	<label>Subject :</label>
+	<input type="text" id="subjectaisave" name="subjectaisave" placeholder="Add subjectName">
+	<br><br>
+	
+	<label>MainTopic :</label>
+	<input type="text" id="maintopicaisave" name="subjectaisave" placeholder="Add MaintopicName">
+	<br><br>
+	
+	
+	<label>HeadingName :</label>
+	<input type="text" id="subtopicaisave" name="subtopicaisave" placeholder="Add SubtopicName">
+	
+	
+		<br> <br>
+		<textarea id="resultclean" rows="30" cols="70"> Contentishere …</textarea>
+		<br><br>
+		
+		<button id="finalsubmit" onclick="aisave()">Save</button>
+		
+		<hr>
+		<br> <br> <br>
+		<hr>
+
+	</div>
+	
+	</div>
+	
+	<br><br><br>
+	<script>
+	
+//-------------------------------------------------------
+function callnormalcut(){
+	let ap=document.getElementById("result").value;
+	document.getElementById("resultclean").value=ap;
+	
+}
+function aisave(){
+	let subject = document.getElementById("subjectaisave").value;
+	let maintopic = document.getElementById("maintopicaisave").value;
+	let subtopic = document.getElementById("subtopicaisave").value;
+	let  theory= document.getElementById("resultclean").value;
+	
+	fetch('/apirl/callnormalcut', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+        	
+        	subjectname:subject,
+        	maintopicname:maintopic,
+        	subtopicname:subtopic,
+        	theory:theory
+        })
+    })
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById("result").value = data;
+    })
+    .catch(error => {
+        console.error(error);
+    });
+	
+	fetchData();
+	
+}
+	
+function sendPrompt() {
+
+    let userPrompt = document.getElementById("prompt").value;
+
+    fetch('/apap/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            prompt: userPrompt
+        })
+    })
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById("result").value = data;
+    })
+    .catch(error => {
+        console.error(error);
+    });
+
+}
+
+function callmaincut(){
+	 let mainstart = document.getElementById("mainstart").value;
+	    let mainend = document.getElementById("mainend").value;
+	    let result = document.getElementById("result").value;
+	    console.log("Maincutcall");
+	    fetch('/apirl/callmaincut', {
+	        method: 'POST',
+	        headers: {
+	            'Content-Type': 'application/json'
+	        },
+	        body: JSON.stringify({
+	        	mainstart: mainstart,
+	            mainend: mainend,
+	            result: result
+	        })
+	    })
+	    .then(response => response.text())
+	    .then(data => {
+	        document.getElementById("resultclean").innerHTML = data;
+	    })
+	    .catch(error => {
+	        console.error(error);
+	    });
+
+	
+}
+
+
+
+
+//-------------------------------------------------------------
+function callapi(){
+	document.getElementById("apit").value=document.getElementById("result").value;
+}
+/*
+}
+	function callapi(){
+		let s;
+		fetch("/apirl/message")
+	    .then(response => response.json())
+	    .then(data => {
+	    	console.log(data.message);
+	    	
+	    	document.getElementById("apit").value=data.message;
+	    	
+	    });
+		//console.log(s);
+		//document.getElementById("apit").value=document.getElementById("apit").value+s;
+		
+	}
+/* GLOBAL DATA */
+let data = {};
+
+/* LOAD DATA FROM SPRING BOOT */
+async function fetchData() {
+    try {
+        const response = await fetch("/apirl/rl");
+        if (!response.ok) {
+            throw new Error("Failed to load data");
+        }
+        data = await response.json();
+        console.log(data);
+        loadSubjects();
+    } catch (error) {
+        console.error(error);
+        document.getElementById("contentArea").innerHTML = `
+            <h2>Error</h2>
+            <p>Unable to load data from server.</p>
+        `;
+    }
+}
+
+/* ================= LOAD SUBJECTS ================= */
+function loadSubjects(){
+    let sidebar = document.getElementById("sidebar");
+    sidebar.innerHTML = "<h2>Subjects</h2>";
+
+    for(let subject in data){
+        let subjectBtn = document.createElement("button");
+        subjectBtn.className = "btn-sidebar";
+        subjectBtn.innerText = subject;
+        subjectBtn.onclick = () => loadTopics(subject);
+        sidebar.appendChild(subjectBtn);
+    }
+}
+
+/* ================= LOAD TOPICS ================= */
+function loadTopics(subject){
+    let sidebar = document.getElementById("sidebar");
+    sidebar.innerHTML = `<h2>${subject}</h2>`;
+
+    let backBtn = document.createElement("button");
+    backBtn.className = "btn-sidebar";
+    backBtn.innerText = "⬅ Back";
+    backBtn.onclick = loadSubjects;
+    sidebar.appendChild(backBtn);
+
+    for(let topic in data[subject]){
+        let topicBtn = document.createElement("button");
+        topicBtn.className = "btn-sidebar";
+        topicBtn.innerText = topic;
+        sidebar.appendChild(topicBtn);
+
+        let subContainer = document.createElement("div");
+        subContainer.className = "subtopic-container";
+        sidebar.appendChild(subContainer);
+
+        topicBtn.onclick = () => {
+            if(subContainer.innerHTML !== ""){
+                subContainer.innerHTML = "";
+                return;
+            }
+
+            let subtopics = data[subject][topic];
+            for(let sub in subtopics){
+                let subBtn = document.createElement("button");
+                subBtn.className = "sub-btn";
+                subBtn.innerText = sub;
+                subBtn.onclick = () => {
+                    showContent(sub, subtopics[sub]);
+                };
+                subContainer.appendChild(subBtn);
+            }
+        };
+    }
+}
+
+/* ================= SHOW CONTENT ================= */
+function showContent(title, text){
+    let content = document.getElementById("contentArea");
+    content.innerHTML = `
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">${title}</h3>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">${text}</p>
+            </div>
+        </div>
+    `;
+}
+
+/* INITIAL LOAD */
+fetchData();
+</script>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

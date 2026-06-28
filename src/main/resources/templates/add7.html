@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Subject Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f7fc;
+      color: #333;
+    }
+
+    /* MAIN LAYOUT */
+    .container-fluid {
+      display: flex;
+      height: 100vh;
+      padding: 0;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 28%;
+      background: linear-gradient(180deg, #1e3c72, #2a5298);
+      color: white;
+      padding: 20px;
+      overflow-y: auto;
+      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    /* CONTENT — whole card scrolls here (heading is NOT fixed/sticky) */
+    .content {
+      width: 72%;
+      padding: 8px;
+      overflow-y: auto;       /* entire card scrolls, including header */
+      overflow-x: hidden;
+      background: #eef2f7;
+    }
+
+    /* SIDEBAR BUTTONS */
+    .btn-sidebar {
+      width: 100%;
+      border: none;
+      padding: 12px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      color: white;
+      font-weight: 600;
+      transition: 0.3s;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .btn-sidebar:hover {
+      background: #00c9a7;
+      transform: translateX(5px);
+    }
+
+    /* SUBTOPICS */
+    .subtopic-container {
+      margin-left: 15px;
+      margin-bottom: 10px;
+    }
+
+    .sub-btn {
+      width: 95%;
+      border: none;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 6px;
+      background: #16a085;
+      color: white;
+      transition: 0.3s;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .sub-btn:hover {
+      background: #27ae60;
+      transform: translateX(5px);
+    }
+
+    /* CONTENT CARD — natural height; .content scrolls it entirely */
+    .card {
+      border: none !important;
+      border-radius: 12px !important;
+      overflow: hidden;
+    }
+
+    /* HEADER — static, scrolls away with the rest of the card */
+    .card-header {
+      position: static;       /* not fixed / not sticky */
+      background: linear-gradient(45deg, #0d6efd, #4f8cff) !important;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 14px 18px !important;
+    }
+
+    .card-header h3 {
+      margin: 0;
+      flex: 1 1 auto;
+    }
+
+    /* Edit / Save buttons inside card header */
+    .card-header-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-card-edit {
+      background: rgba(255, 255, 255, 0.25);
+      border: 1.5px solid rgba(255, 255, 255, 0.7);
+      color: #fff;
+      padding: 6px 16px;
+      border-radius: 7px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+
+    .btn-card-edit:hover {
+      background: rgba(255, 255, 255, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .btn-card-save {
+      background: #27ae60;
+      border: 1.5px solid #219150;
+      color: #fff;
+      padding: 6px 16px;
+      border-radius: 7px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+
+    .btn-card-save:hover {
+      background: #1e8449;
+      transform: translateY(-1px);
+    }
+
+    .card-body {
+      background: white;
+      line-height: 1.8;
+      font-size: 16px;
+      padding: 0 !important;
+    }
+
+    /* THEORY TEXTAREA inside card — grows vertically with content, scrolls horizontally for wide lines */
+    #theoryText {
+      width: 100%;
+      min-height: calc(100vh - 110px); /* fills viewport initially */
+      resize: none;
+      border: none;
+      outline: none;
+      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 16px;
+      line-height: 1.8;
+      color: #333;
+      background: #fff;
+      white-space: pre;       /* preserve line breaks, no auto-wrap */
+      overflow-x: auto;       /* horizontal scroll for wide content */
+      overflow-y: hidden;     /* vertical handled by auto-resize + .content scroll */
+      border-radius: 0 0 12px 12px;
+      display: block;
+      box-sizing: border-box;
+      cursor: default;
+    }
+
+    #theoryText.editable {
+      background: #f0f7ff;
+      cursor: text;
+      border-top: 2px solid #0d6efd;
+      overflow-y: auto;        /* allow inner vertical scroll only while actively editing */
+    }
+
+    /* FORM SECTION */
+    .sec {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      padding: 40px;
+      flex-wrap: wrap;
+      background: #eef2f7;
+    }
+
+    /* FORM BOX */
+    .ap {
+      width: 460px;
+      padding: 25px;
+      background: rgb(232, 230, 230);
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      transition: 0.3s;
+    }
+
+    .ap:hover {
+      transform: translateY(-4px);
+    }
+
+    .ap h2 {
+      margin-bottom: 20px;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    .form-control {
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #dcdcdc;
+    }
+
+    .form-control:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 10px rgba(13, 110, 253, 0.2);
+    }
+
+    /* AI CONTAINER */
+    .aicontainer {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px;
+      width: 90%;
+      margin: 30px auto;
+    }
+
+    .zzz,
+    .ztwo {
+      flex: 1 1 0;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    label {
+      font-weight: 600;
+      color: #34495e;
+      font-size: 14px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #0d6efd;
+      box-shadow: 0 0 8px rgba(13, 110, 253, 0.2);
+    }
+
+    textarea {
+      width: 100%;
+      height: 320px;
+      border-radius: 10px;
+      border: 1px solid #d0d0d0;
+      padding: 12px;
+      resize: vertical;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+      background: #fafafa;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #0d6efd;
+      box-shadow: 0 0 10px rgba(13, 110, 253, 0.2);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      background: linear-gradient(45deg, #0d6efd, #3f8cff);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(13, 110, 253, 0.25);
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #0d6efd;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #e9ecef;
+    }
+
+    /* MOBILE */
+    @media (max-width: 992px) {
+
+      .container-fluid {
+        flex-direction: column;
+        height: auto;
+      }
+
+      .sidebar {
+        width: 100%;
+        padding: 15px;
+      }
+
+      .content {
+        width: 100%;
+        padding: 6px;
+        background: #eef2f7;
+        overflow-y: auto;
+      }
+
+      .card {
+        border-radius: 12px !important;
+        margin: 0;
+      }
+
+      .card-header h3 {
+        font-size: 1.3rem;
+        font-weight: bold;
+      }
+
+      .card-body {
+        padding: 0 !important;
+      }
+
+      #theoryText {
+        font-size: 18px;
+        line-height: 1.8;
+        min-height: 60vh;
+        padding: 14px;
+      }
+
+      .btn-sidebar {
+        font-size: 16px;
+        padding: 14px;
+      }
+
+      .sub-btn {
+        font-size: 15px;
+        padding: 12px;
+      }
+
+      .sec {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .ap {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .aicontainer {
+        flex-direction: column;
+        width: 100%;
+        padding: 10px;
+      }
+
+      .zzz,
+      .ztwo {
+        width: 100%;
+      }
+
+      textarea {
+        height: 250px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP SPLIT: SIDEBAR + CONTENT -->
+  <div class="container-fluid">
+
+    <div class="sidebar" id="sidebar"></div>
+    <!-- -------------------------------------    -->
+
+    <div class="content" id="contentArea">
+
+      <h2>Welcome</h2>
+      <p>Select any subtopic.</p>
+
+      <hr>
+    </div>
+
+    <!-- -------------------------------------    -->
+
+  </div>
+
+  <!-- AI SECTION -->
+  <div class="aicontainer">
+
+    <!-- LEFT: Ask AI -->
+    <div class="zzz">
+
+      <h2>Ask AI</h2>
+      <input type="text" id="prompt" placeholder="Enter your question…">
+      <div class="btn-row">
+        <button onclick="sendPrompt()">Ask</button>
+        <button onclick="callnormalcut()">Move to Save</button>
+      </div>
+      <h4 id="myHeading">Ai Response :</h4>
+      <textarea id="result" placeholder="AI response appears here…"></textarea>
+      <br>
+      <hr>
+
+      <div class="ap">
+        <h2>Remove Data</h2>
+        <input type="text" id="delsubject" class="form-control" placeholder="Subject Name">
+        <input type="text" id="delmaintopic" class="form-control" placeholder="Main Topic Name">
+        <input type="text" id="delsubtopic" class="form-control" placeholder="Sub Topic Name">
+        <button onclick="deleteData()" class="btn btn-danger w-100 mt-2">
+          Delete
+        </button>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Edit & Save -->
+    <div class="ztwo">
+      <h2>Add Data</h2>
+      <label>Subject</label>
+      <input type="text" id="subjectaisave" placeholder="Subject Name">
+
+      <label>Main Topic</label>
+      <input type="text" id="maintopicaisave" placeholder="Main Topic Name">
+
+      <label>Heading / Subtopic</label>
+      <input type="text" id="subtopicaisave" placeholder="Sub Topic Name">
+
+      <label>Cleaned Content</label>
+      <textarea id="resultclean" placeholder="Edit content before saving…"></textarea>
+
+      <button id="finalsubmit" onclick="aisave()">Save</button>
+    </div>
+
+  </div>
+
+  <br><br>
+
+  <script>
+
+    /* ---- track what's currently displayed ---- */
+    let currentSubject   = "";
+    let currentMaintopic = "";
+    let currentSubtopic  = "";
+
+    /* ---- DELETE ---- */
+    function deleteData() {
+      const subject   = document.getElementById("delsubject").value.trim();
+      const maintopic = document.getElementById("delmaintopic").value.trim();
+      const subtopic  = document.getElementById("delsubtopic").value.trim();
+
+      if (!subject || !maintopic || !subtopic) {
+        alert("Fill all delete fields");
+        return;
+      }
+
+      fetch('/apirl/del', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subjectname: subject, maintopicname: maintopic, subtopicname: subtopic })
+      })
+        .then(response => response.text())
+        .then(async result => {
+          if (data[subject] && data[subject][maintopic] && data[subject][maintopic][subtopic]) {
+            delete data[subject][maintopic][subtopic];
+            if (Object.keys(data[subject][maintopic]).length === 0) delete data[subject][maintopic];
+            if (Object.keys(data[subject]).length === 0) delete data[subject];
+          }
+
+          loadSubjects();
+
+          document.getElementById("contentArea").innerHTML =
+            `<h2>Deleted Successfully</h2><p>${subtopic} removed.</p>`;
+
+          alert("[- " + subtopic + " -] Deleted Successfully");
+          document.getElementById("delsubject").value   = "";
+          document.getElementById("delmaintopic").value = "";
+          document.getElementById("delsubtopic").value  = "";
+          console.log(result);
+        })
+        .catch(error => { console.error(error); alert("Delete Failed"); });
+    }
+
+    /* ---- COPY RESULT → CLEAN ---- */
+    function callnormalcut() {
+      document.getElementById("resultclean").value = document.getElementById("result").value;
+    }
+
+    /* ---- SAVE AI CONTENT ---- */
+    function aisave() {
+      const subject   = document.getElementById("subjectaisave").value.trim();
+      const maintopic = document.getElementById("maintopicaisave").value.trim();
+      const subtopic  = document.getElementById("subtopicaisave").value.trim();
+      const theory    = document.getElementById("resultclean").value.trim();
+
+      if (!subject || !maintopic || !subtopic || !theory) {
+        alert("Please fill all fields");
+        return;
+      }
+
+      fetch('/apirl/callnormalcut', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subjectname: subject, maintopicname: maintopic, subtopicname: subtopic, theory: theory })
+      })
+        .then(response => response.text())
+        .then(async dataResponse => {
+          await fetchData();
+          showContent(subject, maintopic, subtopic, theory);
+          document.getElementById("subtopicaisave").value = "";
+          document.getElementById("resultclean").value    = "";
+        })
+        .catch(error => { console.error(error); alert("Save Failed"); });
+    }
+
+    /* ---- SEND PROMPT ---- */
+    function sendPrompt() {
+      const userPrompt = document.getElementById("prompt").value;
+      document.getElementById("myHeading").innerHTML = "AI Response is Loading . . . . .";
+      fetch('/apap/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: userPrompt })
+      })
+        .then(r => r.text())
+        .then(d => { document.getElementById("result").value = d; })
+        .catch(console.error);
+    }
+
+    /* ---- MAIN CUT ---- */
+    function callmaincut() {
+      const mainstart = document.getElementById("mainstart").value;
+      const mainend   = document.getElementById("mainend").value;
+      const result    = document.getElementById("result").value;
+
+      fetch('/apirl/callmaincut', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mainstart, mainend, result })
+      })
+        .then(r => r.text())
+        .then(d => { document.getElementById("resultclean").innerHTML = d; })
+        .catch(console.error);
+    }
+
+    /* ---- CARD: ENABLE EDIT ---- */
+    function enableCardEdit() {
+      const ta = document.getElementById("theoryText");
+      if (!ta) return;
+      ta.removeAttribute("readonly");
+      ta.classList.add("editable");
+      ta.focus();
+    }
+
+    /* ---- CARD: SAVE EDITED CONTENT ---- */
+    function saveCardEdit() {
+      const ta = document.getElementById("theoryText");
+      if (!ta) return;
+
+      const newTheory = ta.value.trim();
+
+      if (!currentSubject || !currentMaintopic || !currentSubtopic) {
+        alert("No subtopic selected to save.");
+        return;
+      }
+
+      if (!newTheory) {
+        alert("Content cannot be empty.");
+        return;
+      }
+
+      fetch('/apirl/callnormalcut', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subjectname:   currentSubject,
+          maintopicname: currentMaintopic,
+          subtopicname:  currentSubtopic,
+          theory:        newTheory
+        })
+      })
+        .then(response => response.text())
+        .then(async () => {
+          // Update local data object
+          if (data[currentSubject] && data[currentSubject][currentMaintopic]) {
+            data[currentSubject][currentMaintopic][currentSubtopic] = newTheory;
+          }
+
+          // Lock textarea back to read-only
+          ta.setAttribute("readonly", true);
+          ta.classList.remove("editable");
+          autoResizeTextarea(ta);
+
+          alert("Saved successfully!");
+        })
+        .catch(error => { console.error(error); alert("Save Failed"); });
+    }
+
+    /* ---- AUTO-GROW TEXTAREA so the whole card (incl. header) scrolls together ---- */
+    function autoResizeTextarea(ta) {
+      ta.style.height = "auto";
+      ta.style.height = ta.scrollHeight + "px";
+    }
+
+    /* ---- SHOW CONTENT (textarea version) ---- */
+    function showContent(subject, maintopic, subtopic, text) {
+      currentSubject   = subject   || currentSubject;
+      currentMaintopic = maintopic || currentMaintopic;
+      currentSubtopic  = subtopic;
+
+      document.getElementById("contentArea").innerHTML = `
+        <div class="card shadow">
+          <div class="card-header text-white">
+            <h3 class="mb-0">${subtopic}</h3>
+            <div class="card-header-actions">
+              <button class="btn-card-edit" onclick="enableCardEdit()">✏️ Edit</button>
+              <button class="btn-card-save" onclick="saveCardEdit()">💾 Save</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <textarea id="theoryText" readonly spellcheck="false"></textarea>
+          </div>
+        </div>
+      `;
+
+      const ta = document.getElementById("theoryText");
+      ta.value = text;
+
+      // Grow to fit all content so the page (not the textarea) scrolls
+      autoResizeTextarea(ta);
+      ta.addEventListener("input", () => autoResizeTextarea(ta));
+    }
+
+    /* ---- DATA LOADING ---- */
+    let data = {};
+
+    async function fetchData() {
+      try {
+        const response = await fetch("/apirl/rl");
+        if (!response.ok) throw new Error("Failed to load data");
+        data = await response.json();
+        loadSubjects();
+        return true;
+      } catch (error) {
+        console.error(error);
+        document.getElementById("contentArea").innerHTML =
+          "<h2>Error</h2><p>Unable to load data from server.</p>";
+      }
+    }
+
+    function loadSubjects() {
+      const sidebar = document.getElementById("sidebar");
+      sidebar.innerHTML = "<h2>Subjects</h2>";
+      for (let subject in data) {
+        const btn = document.createElement("button");
+        btn.className = "btn-sidebar";
+        btn.innerText = subject;
+        btn.onclick = () => loadTopics(subject);
+        sidebar.appendChild(btn);
+      }
+    }
+
+    function loadTopics(subject) {
+      const sidebar = document.getElementById("sidebar");
+      sidebar.innerHTML = `<h2>${subject}</h2>`;
+
+      const backBtn = document.createElement("button");
+      backBtn.className = "btn-sidebar";
+      backBtn.innerText = "⬅ Back";
+      backBtn.onclick = loadSubjects;
+      sidebar.appendChild(backBtn);
+
+      for (let topic in data[subject]) {
+        const topicBtn = document.createElement("button");
+        topicBtn.className = "btn-sidebar";
+        topicBtn.innerText = topic;
+        sidebar.appendChild(topicBtn);
+
+        const subContainer = document.createElement("div");
+        subContainer.className = "subtopic-container";
+        sidebar.appendChild(subContainer);
+
+        topicBtn.onclick = () => {
+          if (subContainer.innerHTML !== "") { subContainer.innerHTML = ""; return; }
+          const subtopics = data[subject][topic];
+          for (let sub in subtopics) {
+            const subBtn = document.createElement("button");
+            subBtn.className = "sub-btn";
+            subBtn.innerText = sub;
+            subBtn.onclick = () => showContent(subject, topic, sub, subtopics[sub]);
+            subContainer.appendChild(subBtn);
+          }
+        };
+      }
+    }
+
+    fetchData();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
