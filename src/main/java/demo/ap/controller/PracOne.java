@@ -20,7 +20,7 @@ import demo.ap.entity.Maincut;
 import demo.ap.entity.Maintopic;
 import demo.ap.entity.Recorddemo;
 import demo.ap.repo.Recorddemorepo;
-@CrossOrigin("*")
+
 @RestController
 @RequestMapping("/apirl")
 public class PracOne {
@@ -69,7 +69,7 @@ public class PracOne {
 
 	@PostMapping("/callmaincut")
 	public String callmaincut(@RequestBody Maincut m) {
-		
+		/*
 		String s;
 		String den;
 		String ms = "", me = "";
@@ -134,7 +134,8 @@ for(int i=0;i<s.length();i++) {
 
 
 		//n s.substring(si, se) + s.substring(se+1, se+1+me.length()-1);
-
+*/
+		return "maincut";
 	}
 
 	@GetMapping("rl")
