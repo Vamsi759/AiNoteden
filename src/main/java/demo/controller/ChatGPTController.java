@@ -20,8 +20,8 @@ public class ChatGPTController {
 
     @PostMapping("/chat")
     public String chat(@RequestBody PromptRequest promptRequest){
-       // return chatGPTService.getChatResponse(promptRequest);
-        return "In prompt mention key and then you gain response";
+         return chatGPTService.getChatResponse(promptRequest);
+        /*return "In prompt mention key and then you gain response";*/
     }
     
 // deno
