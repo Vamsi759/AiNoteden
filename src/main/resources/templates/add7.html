@@ -51,6 +51,52 @@
       overflow-x: hidden;
       background: #eef2f7;
     }
+     /* FLOATING CHATBOT STYLE BUTTON CONTAINER */
+    .bot-action-container {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      z-index: 9999; /* Keeps buttons layered perfectly over all elements */
+      display: flex;
+      flex-direction: column; 
+      gap: 12px;
+    }
+
+    .btn-bot-action {
+      padding: 12px 24px;
+      border-radius: 50px; /* Rounded pill chat-widget design */
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      color: white;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* Edit Bot Variant */
+    .btn-bot-action.edit-bot {
+      background: linear-gradient(135deg, #f39c12, #e67e22);
+    }
+
+    .btn-bot-action.edit-bot:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 8px 20px rgba(243, 156, 18, 0.4);
+    }
+
+    /* Save Bot Variant */
+    .btn-bot-action.save-bot {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+    }
+
+    .btn-bot-action.save-bot:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+    }
 
     /* SIDEBAR BUTTONS */
     .btn-sidebar {
@@ -418,6 +464,10 @@
 </head>
 
 <body>
+<div class="bot-action-container" id="botInterface" style="display: none;">
+    <button class="btn-bot-action edit-bot" onclick="enableCardEdit()">✏️ Edit</button>
+    <button class="btn-bot-action save-bot" onclick="saveCardEdit()">💾 Save</button>
+  </div>
 
   <!-- TOP SPLIT: SIDEBAR + CONTENT -->
   <div class="container-fluid">
@@ -684,15 +734,16 @@
       currentSubject   = subject   || currentSubject;
       currentMaintopic = maintopic || currentMaintopic;
       currentSubtopic  = subtopic;
+      document.getElementById("botInterface").style.display = "flex";
 
       document.getElementById("contentArea").innerHTML = `
         <div class="card shadow">
           <div class="card-header text-white">
             <h3 class="mb-0">${subtopic}</h3>
-            <div class="card-header-actions">
+            <!--div class="card-header-actions">
               <button class="btn-card-edit" onclick="enableCardEdit()">✏️ Edit</button>
               <button class="btn-card-save" onclick="saveCardEdit()">💾 Save</button>
-            </div>
+            </div-->
           </div>
           <div class="card-body">
             <textarea id="theoryText" readonly spellcheck="false"></textarea>
@@ -706,6 +757,15 @@
       // Grow to fit all content so the page (not the textarea) scrolls
       autoResizeTextarea(ta);
       ta.addEventListener("input", () => autoResizeTextarea(ta));
+    }
+    
+    /* ---- CHATBOT CORE CALLBACK ACTIONS ---- */
+    function enableCardEdit() {
+      const ta = document.getElementById("theoryText");
+      if (!ta) return;
+      ta.removeAttribute("readonly");
+      ta.classList.add("editable");
+      ta.focus();
     }
 
     /* ---- DATA LOADING ---- */
