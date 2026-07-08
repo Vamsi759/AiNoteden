@@ -648,10 +648,35 @@
         .catch(error => { console.error(error); alert("Save Failed"); });
     }
 
-    /* ---- AUTO-GROW TEXTAREA so the whole card (incl. header) scrolls together ---- */
+    /* ---- AUTO-GROW TEXTAREA (FIXED) ----
+       Problem before: on every keystroke we set height="auto" then
+       height=scrollHeight. That collapse+regrow forces the browser to
+       recompute layout, and because #theoryText lives inside the
+       scrollable #contentArea, the browser's "keep focused element in
+       view" behavior kicked in and scrolled #contentArea toward the
+       bottom of the now-taller box — even though the caret never moved.
+       That's what looked like "pressing Enter sends the cursor down".
+
+       Fix: 
+         1) Skip the resize entirely when it isn't needed (scrollHeight
+            already fits) so we don't touch layout on every keystroke.
+         2) When a resize IS needed, remember #contentArea's scrollTop
+            before changing height and restore it right after, so the
+            resize can no longer drag the scroll position around.
+    ---------------------------------------------------------------- */
     function autoResizeTextarea(ta) {
+      // Nothing to do if the box already fits the content
+      if (ta.scrollHeight <= ta.clientHeight) return;
+
+      const scroller = document.getElementById("contentArea");
+      const prevScrollTop = scroller ? scroller.scrollTop : null;
+
       ta.style.height = "auto";
       ta.style.height = ta.scrollHeight + "px";
+
+      if (scroller && prevScrollTop !== null) {
+        scroller.scrollTop = prevScrollTop;
+      }
     }
 
     /* ---- SHOW CONTENT (textarea version) ---- */
